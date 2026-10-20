@@ -1,11 +1,19 @@
 import { supabase } from './supabaseClient.js';
 
+async function start() {
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) location.href = 'index.html';
+if (!session) {
+  location.replace('index.html');
+  return;
+}
 
-const { data: profile } = await supabase.from('profiles')
+const { data: profile, error: profileError } = await supabase.from('profiles')
   .select('*').eq('user_id', session.user.id).single();
-if (profile.role !== 'Scholar') location.href = 'staff.html';
+if (profileError || profile?.role !== 'Scholar') {
+  location.replace('index.html');
+  return;
+}
+document.body.hidden = false;
 
 const { data: assignments } = await supabase.from('scholar_assignments')
   .select('*').eq('user_id', session.user.id).eq('status', 'Active');
@@ -61,3 +69,6 @@ document.getElementById('logout').onclick = async () => {
 };
 
 loadSubmissions();
+}
+
+start();

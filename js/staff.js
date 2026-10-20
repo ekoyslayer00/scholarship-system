@@ -1,11 +1,19 @@
 import { supabase } from './supabaseClient.js';
 
+async function start() {
 const { data: { session } } = await supabase.auth.getSession();
-if (!session) location.href = 'index.html';
+if (!session) {
+  location.replace('index.html');
+  return;
+}
 
-const { data: profile } = await supabase.from('profiles')
+const { data: profile, error: profileError } = await supabase.from('profiles')
   .select('*').eq('user_id', session.user.id).single();
-if (profile.role !== 'Scholarship Staff') location.href = 'scholar.html';
+if (profileError || profile?.role !== 'Scholarship Staff') {
+  location.replace('index.html');
+  return;
+}
+document.body.hidden = false;
 
 let current = null;
 
@@ -95,3 +103,6 @@ document.getElementById('logout').onclick = async () => {
 };
 
 loadQueue();
+}
+
+start();

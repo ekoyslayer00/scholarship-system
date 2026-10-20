@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"><title>Scholarship System — Login</title>
+<link rel="stylesheet" href="css/styles.css">
+</head><body class="auth">
+<main class="card">
+  <h1>Scholarship Monitoring</h1>
+  <form id="login-form">
+    <label>Email <input type="email" id="email" required></label>
+    <label>Password <input type="password" id="password" required></label>
+    <button type="submit">Sign in</button>
+  </form>
+  <p id="msg" class="msg"></p>
+</main>
+<script type="module">
+import { supabase } from './js/supabaseClient.js';
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  if (error) { document.getElementById('msg').textContent = error.message; return; }
+  const { data: profile } = await supabase.from('profiles')
+    .select('role').eq('user_id', data.user.id).single();
+  location.href = profile.role === 'Scholarship Staff' ? 'staff.html' : 'scholar.html';
+});
+</script>
+</body></html>

@@ -5,8 +5,13 @@ alter table public.semester_submissions enable row level security;
 alter table public.evaluation_history enable row level security;
 
 create or replace function public.current_role()
-returns text language sql stable as $$
-  select role from public.profiles where user_id = auth.uid();
+returns text
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select role from public.profiles where user_id = (select auth.uid()) limit 1;
 $$;
 
 create policy "profiles_select" on public.profiles
