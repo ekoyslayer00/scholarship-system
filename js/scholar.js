@@ -15,7 +15,7 @@ if (profileError || profile?.role !== 'Scholar') {
 }
 document.body.hidden = false;
 
-const { data: assignments } = await supabase.from('scholar_assignments')
+const { data: assignments, error: assignmentError } = await supabase.from('scholar_assignments')
   .select('*').eq('user_id', session.user.id).eq('status', 'Active');
 const assignment = assignments?.[0];
 
@@ -38,6 +38,10 @@ async function loadSubmissions() {
 
 document.getElementById('submit-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+  if (assignmentError) {
+    document.getElementById('msg').textContent = `Could not load assignment: ${assignmentError.message}`;
+    return;
+  }
   if (!assignment) { document.getElementById('msg').textContent = 'No active assignment.'; return; }
   const payload = {
     assignment_id: assignment.assignment_id,
