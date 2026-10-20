@@ -86,11 +86,14 @@ document.querySelector('#queue').addEventListener('click', async (e) => {
     const { error } = await supabase.from('semester_submissions')
       .update({ verification_status: status }).eq('submission_id', id);
     if (error) return alert(error.message);
-    await supabase.from('evaluation_history').insert({
+    const { error: historyError } = await supabase.from('evaluation_history').insert({
       submission_id: id, staff_id: session.user.id,
       reason: `Verification status set to ${status}.`
     });
-    loadQueue();
+    await loadQueue();
+    if (historyError) {
+      alert(`Status changed to ${status}, but the audit entry failed: ${historyError.message}`);
+    }
   }
 
   if (act === 'evaluate') {

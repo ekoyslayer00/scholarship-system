@@ -70,8 +70,12 @@ for update using (
   and verification_status = 'Submitted'
 );
 
+grant update on public.semester_submissions to authenticated;
+drop policy if exists "submissions_update_staff" on public.semester_submissions;
 create policy "submissions_update_staff" on public.semester_submissions
-for update using (public.current_role() = 'Scholarship Staff');
+for update to authenticated
+using ((select public.current_role()) = 'Scholarship Staff')
+with check ((select public.current_role()) = 'Scholarship Staff');
 
 create policy "evaluations_select" on public.evaluation_history
 for select using (
@@ -83,5 +87,8 @@ for select using (
   )
 );
 
+grant insert on public.evaluation_history to authenticated;
+drop policy if exists "evaluations_insert_staff" on public.evaluation_history;
 create policy "evaluations_insert_staff" on public.evaluation_history
-for insert with check (public.current_role() = 'Scholarship Staff');
+for insert to authenticated
+with check ((select public.current_role()) = 'Scholarship Staff');
