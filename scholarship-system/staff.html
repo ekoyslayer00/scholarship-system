@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html><head>
+<meta charset="utf-8"><title>Staff Dashboard</title>
+<link rel="stylesheet" href="css/styles.css">
+</head><body>
+<header class="bar">
+  <span>Scholarship Staff Dashboard</span>
+  <button id="logout">Sign out</button>
+</header>
+<main class="grid">
+  <section class="card wide">
+    <h2>Submission Queue</h2>
+    <table id="queue">
+      <thead><tr>
+        <th>Scholar</th><th>AY</th><th>Sem</th><th>GWA</th><th>Units</th>
+        <th>Verification</th><th>Compliance</th><th>Award</th><th>Actions</th>
+      </tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <section class="card" id="eval-panel" hidden>
+    <h2>Evaluate Submission</h2>
+    <p id="eval-target" class="muted"></p>
+    <label>Compliance Result
+      <select id="compliance">
+        <option value="Compliant">Compliant</option>
+        <option value="With Deficiency">With Deficiency</option>
+        <option value="Non-compliant">Non-compliant</option>
+      </select>
+    </label>
+    <label>Renewal Decision
+      <select id="decision">
+        <option value="Pending">Pending</option>
+        <option value="Approved">Approved</option>
+        <option value="Held">Held</option>
+      </select>
+    </label>
+    <label>Reason <textarea id="reason" required></textarea></label>
+    <button id="save-eval">Save Evaluation</button>
+    <p id="eval-msg" class="msg"></p>
+  </section>
+</main>
+<script type="module" src="js/staff.js"></script>
+</body></html>
