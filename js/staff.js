@@ -22,31 +22,57 @@ async function loadQueue() {
     .select(`
       submission_id, academic_year, semester, gwa, enrolled_units,
       verification_status, compliance_result, award_status, scholar_id,
-      profiles:scholar_id ( full_name )
+      profiles:profiles!semester_submissions_scholar_id_fkey ( full_name )
     `)
     .order('submitted_at', { ascending: false });
 
   const tbody = document.querySelector('#queue tbody');
-  tbody.innerHTML = '';
-  (data || []).forEach(s => {
-    tbody.insertAdjacentHTML('beforeend', `
-      <tr>
-        <td>${s.profiles?.full_name ?? s.scholar_id}</td>
-        <td>${s.academic_year}</td><td>${s.semester}</td>
-        <td>${s.gwa}</td><td>${s.enrolled_units}</td>
-        <td>${s.verification_status}</td>
-        <td>${s.compliance_result ?? '—'}</td>
-        <td>${s.award_status}</td>
-        <td>
-          ${s.verification_status === 'Submitted'
-            ? `<button data-act="verify" data-id="${s.submission_id}">Verify</button>
-               <button data-act="return" data-id="${s.submission_id}">Return</button>`
-            : ''}
-          ${s.verification_status === 'Verified'
-            ? `<button data-act="evaluate" data-id="${s.submission_id}">Evaluate</button>`
-            : ''}
-        </td>
-      </tr>`);
+  tbody.replaceChildren();
+  if (error) {
+    const row = tbody.insertRow();
+    const cell = row.insertCell();
+    cell.colSpan = 9;
+    cell.textContent = `Could not load submissions: ${error.message}`;
+    return;
+  }
+  if (!data?.length) {
+    const row = tbody.insertRow();
+    const cell = row.insertCell();
+    cell.colSpan = 9;
+    cell.textContent = 'No submissions to review.';
+    return;
+  }
+
+  data.forEach((submission) => {
+    const row = tbody.insertRow();
+    const values = [
+      submission.profiles?.full_name ?? submission.scholar_id,
+      submission.academic_year,
+      submission.semester,
+      submission.gwa,
+      submission.enrolled_units,
+      submission.verification_status,
+      submission.compliance_result ?? '—',
+      submission.award_status
+    ];
+    values.forEach((value) => {
+      row.insertCell().textContent = value;
+    });
+
+    const actionsCell = row.insertCell();
+    const actionButtons = submission.verification_status === 'Submitted'
+      ? [['verify', 'Verify'], ['return', 'Return']]
+      : submission.verification_status === 'Verified'
+        ? [['evaluate', 'Evaluate']]
+        : [];
+    actionButtons.forEach(([action, label]) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.dataset.act = action;
+      button.dataset.id = submission.submission_id;
+      button.textContent = label;
+      actionsCell.append(button);
+    });
   });
 }
 
