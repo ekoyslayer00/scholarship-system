@@ -1,16 +1,42 @@
 <!DOCTYPE html>
 <html><head>
 <meta charset="utf-8"><title>Scholarship System — Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head><body class="auth">
-<main class="card">
-  <h1>Scholarship Monitoring</h1>
-  <form id="login-form">
-    <label>Email <input type="email" id="email" required></label>
-    <label>Password <input type="password" id="password" required></label>
-    <button type="submit">Sign in</button>
-  </form>
-  <p id="msg" class="msg"></p>
+<main class="login-layout" aria-labelledby="login-title">
+  <section class="login-brand" aria-label="Scholarship Monitoring">
+    <div class="login-wordmark">
+      <span class="login-mark" aria-hidden="true">SM</span>
+      <span>STUDENT SERVICES</span>
+    </div>
+    <div class="login-brand-copy">
+      <p class="login-kicker">SCHOLARSHIP OFFICE</p>
+      <h1 id="login-title">Scholarship<br>Monitoring</h1>
+      <p>Academic progress and scholarship support, in one place.</p>
+    </div>
+    <p class="login-brand-footer">STUDENT SUPPORT PORTAL</p>
+  </section>
+
+  <section class="login-main" aria-labelledby="signin-title">
+    <div class="login-form-wrap">
+      <p class="login-kicker">ACCOUNT ACCESS</p>
+      <h2 id="signin-title">Welcome back</h2>
+      <p class="login-description">Sign in to continue to your account.</p>
+      <form id="login-form" class="login-form">
+        <label for="email">Email address</label>
+        <input type="email" id="email" name="email" autocomplete="username" required>
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+        <button type="submit">Sign in</button>
+      </form>
+      <p id="msg" class="msg login-message" role="status" aria-live="polite"></p>
+    </div>
+    <footer class="login-footer">Scholarship Monitoring System</footer>
+  </section>
 </main>
 <script type="module">
 import { supabase } from './js/supabaseClient.js';
