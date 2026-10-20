@@ -35,8 +35,14 @@ using (
   or (select public.current_role()) = 'Scholarship Staff'
 );
 
+grant select on public.semester_submissions to authenticated;
+drop policy if exists "submissions_select" on public.semester_submissions;
 create policy "submissions_select" on public.semester_submissions
-for select using (scholar_id = auth.uid() or public.current_role() = 'Scholarship Staff');
+for select to authenticated
+using (
+  scholar_id = (select auth.uid())
+  or (select public.current_role()) = 'Scholarship Staff'
+);
 
 grant insert on public.semester_submissions to authenticated;
 drop policy if exists "submissions_insert_scholar" on public.semester_submissions;

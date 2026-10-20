@@ -16,11 +16,25 @@ if (profileError || profile?.role !== 'Scholar') {
 document.body.hidden = false;
 
 async function loadSubmissions() {
-  const { data } = await supabase.from('semester_submissions')
+  const { data, error } = await supabase.from('semester_submissions')
     .select('*').eq('scholar_id', session.user.id)
     .order('submitted_at', { ascending: false });
   const tbody = document.querySelector('#subs tbody');
-  tbody.innerHTML = '';
+  tbody.replaceChildren();
+  if (error) {
+    const row = tbody.insertRow();
+    const cell = row.insertCell();
+    cell.colSpan = 7;
+    cell.textContent = `Could not load submissions: ${error.message}`;
+    return;
+  }
+  if (!data?.length) {
+    const row = tbody.insertRow();
+    const cell = row.insertCell();
+    cell.colSpan = 7;
+    cell.textContent = 'No submissions yet.';
+    return;
+  }
   (data || []).forEach(s => {
     tbody.insertAdjacentHTML('beforeend', `
       <tr>
@@ -64,7 +78,7 @@ document.getElementById('submit-form').addEventListener('submit', async (e) => {
   }
   msg.textContent = 'Submitted.';
   e.target.reset();
-  loadSubmissions();
+  await loadSubmissions();
 });
 
 document.getElementById('logout').onclick = async () => {
