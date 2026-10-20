@@ -13,15 +13,27 @@ set search_path = ''
 as $$
   select role from public.profiles where user_id = (select auth.uid()) limit 1;
 $$;
+grant execute on function public.current_role() to authenticated;
 
+drop policy if exists "profiles_select" on public.profiles;
 create policy "profiles_select" on public.profiles
-for select using (user_id = auth.uid() or public.current_role() = 'Scholarship Staff');
+for select to authenticated
+using (
+  (select auth.uid()) = user_id
+  or (select public.current_role()) = 'Scholarship Staff'
+);
 
 create policy "programs_read" on public.scholarship_programs
 for select using (auth.uid() is not null);
 
+grant select on public.scholar_assignments to authenticated;
+drop policy if exists "assignments_select" on public.scholar_assignments;
 create policy "assignments_select" on public.scholar_assignments
-for select using (user_id = auth.uid() or public.current_role() = 'Scholarship Staff');
+for select to authenticated
+using (
+  user_id = (select auth.uid())
+  or (select public.current_role()) = 'Scholarship Staff'
+);
 
 create policy "submissions_select" on public.semester_submissions
 for select using (scholar_id = auth.uid() or public.current_role() = 'Scholarship Staff');
