@@ -38,8 +38,24 @@ using (
 create policy "submissions_select" on public.semester_submissions
 for select using (scholar_id = auth.uid() or public.current_role() = 'Scholarship Staff');
 
+grant insert on public.semester_submissions to authenticated;
+drop policy if exists "submissions_insert_scholar" on public.semester_submissions;
 create policy "submissions_insert_scholar" on public.semester_submissions
-for insert with check (scholar_id = auth.uid() and public.current_role() = 'Scholar');
+for insert to authenticated
+with check (
+  scholar_id = (select auth.uid())
+  and exists (
+    select 1 from public.profiles p
+    where p.user_id = (select auth.uid())
+      and p.role = 'Scholar'
+  )
+  and exists (
+    select 1 from public.scholar_assignments a
+    where a.assignment_id = semester_submissions.assignment_id
+      and a.user_id = (select auth.uid())
+      and a.status = 'Active'
+  )
+);
 
 create policy "submissions_update_scholar" on public.semester_submissions
 for update using (
