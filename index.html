@@ -20,8 +20,16 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
   const password = document.getElementById('password').value;
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) { document.getElementById('msg').textContent = error.message; return; }
-  const { data: profile } = await supabase.from('profiles')
-    .select('role').eq('user_id', data.user.id).single();
+  const { data: profile, error: profileError } = await supabase.from('profiles')
+    .select('role').eq('user_id', data.user.id).maybeSingle();
+  if (profileError) {
+    document.getElementById('msg').textContent = `Could not load your profile: ${profileError.message}`;
+    return;
+  }
+  if (!profile) {
+    document.getElementById('msg').textContent = 'Your account has no scholarship profile. Contact an administrator to set up your profile.';
+    return;
+  }
   location.href = profile.role === 'Scholarship Staff' ? 'staff.html' : 'scholar.html';
 });
 </script>
