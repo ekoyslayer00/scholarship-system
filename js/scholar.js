@@ -15,10 +15,6 @@ if (profileError || profile?.role !== 'Scholar') {
 }
 document.body.hidden = false;
 
-const { data: assignments, error: assignmentError } = await supabase.from('scholar_assignments')
-  .select('*').eq('user_id', session.user.id).eq('status', 'Active');
-const assignment = assignments?.[0];
-
 async function loadSubmissions() {
   const { data } = await supabase.from('semester_submissions')
     .select('*').eq('scholar_id', session.user.id)
@@ -38,6 +34,9 @@ async function loadSubmissions() {
 
 document.getElementById('submit-form').addEventListener('submit', async (e) => {
   e.preventDefault();
+  const { data: assignment, error: assignmentError } = await supabase.from('scholar_assignments')
+    .select('assignment_id').eq('user_id', session.user.id).eq('status', 'Active')
+    .limit(1).maybeSingle();
   if (assignmentError) {
     document.getElementById('msg').textContent = `Could not load assignment: ${assignmentError.message}`;
     return;
